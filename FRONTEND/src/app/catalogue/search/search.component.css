@@ -1,0 +1,12 @@
+#category {
+    max-width: 8%;
+    margin-right: 10px;
+}
+
+#search-container {
+    display: flex;
+}
+
+.input-group {
+    width: 100%;
+}

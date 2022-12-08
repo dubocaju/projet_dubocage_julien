@@ -12,6 +12,7 @@ import { AddProduct } from "../../shared/actions/cart-action";
 })
 export class CatalogueComponent implements OnInit {
   products: Product[] = [];
+  query: string = '';
   category: string = '';
 
   constructor(
@@ -23,19 +24,23 @@ export class CatalogueComponent implements OnInit {
     this.resetSearch();
   }
 
-  private resetSearch() {
-    this.catalogueService.getProducts().subscribe(
-      products => this.products = products
-    );
-  }
-
   addProductToCart(product: Product) {
     this.store.dispatch(new AddProduct(product));
   }
 
   onSearch(query: string) {
+    this.query = query;
+    this.handleSearch();
+  }
+
+  onCategoryChange(category: string) {
+    this.category = category;
+    this.handleSearch();
+  }
+
+  handleSearch() {
     this.catalogueService.getProducts().pipe(
-      map(products  => products.filter(product => product.name.toLowerCase().includes(query.toLowerCase()))),
+      map(products  => products.filter(product => product.name.toLowerCase().includes(this.query.toLowerCase()))),
       map(products => products.filter(product => this.category ? product.category === this.category : true))
     )
     .subscribe(
@@ -43,12 +48,16 @@ export class CatalogueComponent implements OnInit {
     )
   }
 
-  onCategoryChange(category: string) {
-    this.category = category;
-  }
-
   OnReset() {
     this.resetSearch();
+  }
+
+  private resetSearch() {
+    this.category = '';
+    this.query = '';
+    this.catalogueService.getProducts().subscribe(
+      products => this.products = products
+    );
   }
 
 }

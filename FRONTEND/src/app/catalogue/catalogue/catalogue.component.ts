@@ -4,6 +4,7 @@ import { Product } from "../../shared/entities/product";
 import { map } from "rxjs";
 import { Store } from "@ngxs/store";
 import { AddProduct } from "../../shared/actions/cart-action";
+import { NgxSpinnerService } from "ngx-spinner";
 
 @Component({
   selector: 'app-catalogue',
@@ -17,6 +18,7 @@ export class CatalogueComponent implements OnInit {
 
   constructor(
     private catalogueService: CatalogueService,
+    private spinner: NgxSpinnerService,
     private store: Store
   ) { }
 
@@ -39,13 +41,17 @@ export class CatalogueComponent implements OnInit {
   }
 
   handleSearch() {
+    this.spinner.show();
     this.catalogueService.getProducts().pipe(
       map(products  => products.filter(product => product.name.toLowerCase().includes(this.query.toLowerCase()))),
       map(products => products.filter(product => this.category ? product.category === this.category : true))
     )
     .subscribe(
-      products => this.products = products
-    )
+      products => {
+        this.products = products;
+        this.spinner.hide();
+      }
+    );
   }
 
   OnReset() {
@@ -53,10 +59,14 @@ export class CatalogueComponent implements OnInit {
   }
 
   private resetSearch() {
+    this.spinner.show();
     this.category = '';
     this.query = '';
     this.catalogueService.getProducts().subscribe(
-      products => this.products = products
+      products => {
+        this.products = products;
+        this.spinner.hide();
+      }
     );
   }
 

@@ -1,3 +1,5 @@
+<ngx-spinner type="ball-spin-clockwise-fade" color="#fff"></ngx-spinner>
+
 <div class="container">
   <div *ngIf="loggedIn" class="alert alert-success alert-dismissible" role="alert">
     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -7,6 +9,11 @@
   <div *ngIf="jwtError && !loggedIn" class="alert alert-danger alert-dismissible" role="alert">
     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
     <strong>Erreur : </strong> Vous devez vous connecter pour pouvoir accéder à cette page
+  </div>
+
+  <div *ngIf="loginErrorMessage && !loggedIn" class="alert alert-danger alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <strong>Erreur : </strong> {{loginErrorMessage}}
   </div>
 
   <h2>Se connecter</h2>

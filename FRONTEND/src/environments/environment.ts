@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiBaseUrl: 'http://localhost:8080/api'
+  apiBaseUrl: 'https://met02-dubocage-julien.onrender.com/api'
 };
 
 /*

@@ -4,6 +4,7 @@ import { CatalogueService } from "../services/catalogue.service";
 import { Store } from "@ngxs/store";
 import { ActivatedRoute } from "@angular/router";
 import { AddProduct } from "../../shared/actions/cart-action";
+import { NgxSpinnerService } from "ngx-spinner";
 
 @Component({
   selector: 'app-product-detail',
@@ -17,13 +18,18 @@ export class ProductDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private catalogueService: CatalogueService,
+    private spinner: NgxSpinnerService,
     private store: Store
   ) { }
 
   ngOnInit(): void {
+    this.spinner.show();
     const id = this.route.snapshot.params['id'];
     this.catalogueService.getProduct(id).subscribe(
-      product => this.product = product
+      product => {
+        this.product = product;
+        this.spinner.hide();
+      }
     );
   }
 

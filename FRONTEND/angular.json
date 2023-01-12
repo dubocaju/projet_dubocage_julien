@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "tp06_dubocage_julien": {
+    "projet_dubocage_julien": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/tp06_dubocage_julien",
+            "outputPath": "dist/projet_dubocage_julien",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
@@ -23,7 +23,8 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/ngx-spinner/animations/ball-spin-clockwise-fade.css"
             ],
             "scripts": []
           },
@@ -64,10 +65,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "tp06_dubocage_julien:build:production"
+              "browserTarget": "projet_dubocage_julien:build:production"
             },
             "development": {
-              "browserTarget": "tp06_dubocage_julien:build:development"
+              "browserTarget": "projet_dubocage_julien:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -75,7 +76,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "tp06_dubocage_julien:build"
+            "browserTarget": "projet_dubocage_julien:build"
           }
         },
         "test": {

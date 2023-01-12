@@ -3,20 +3,38 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Factory\AppFactory;
 use Firebase\JWT\JWT;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
-require "client.php";
+require  __DIR__ . '/../src/Client.php';
 require __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../bootstrap.php';
  
 const JWT_SECRET = "makey1234567";
+
+$encoders = array(new JsonEncoder());
+$normalizers = array(new ObjectNormalizer());
+$serializer = new Serializer($normalizers, $encoders);
 
 $app = AppFactory::create();
 
 $app->post('/api/login', function (Request $request, Response $response) {
+    global $entityManager;
     $body = (array)$request->getParsedBody();
-    $login = $body['login'];
-    $password = $body['password'];
+    $clientRepository = $entityManager->getRepository('Client');
+    $client = $clientRepository->findOneBy(array('login' => $body['login']));
 
-    $jwt = createJWT($login, $password);
+    if (!$client) {
+        $response->getBody()->write('{"message":"Aucun utilisateur ne correspond à ce login."}');
+        return $response->withStatus(400);
+    }
+    if (!password_verify($body['password'], $client->getPassword())) {
+        $response->getBody()->write('{"message":"Le mot de passe est incorrect"}');
+        return $response->withStatus(400);
+    }
+
+    $jwt = createJWT($body['login'], $body['password']);
     return $response->withHeader("Authorization", "Bearer $jwt");
 });
 
@@ -34,58 +52,61 @@ function createJWT($login, $password) : string
     return JWT::encode($payload, JWT_SECRET);
 }
 
-$app->get('/api/products', function (Request $request, Response $response) {
-    $json = getProductsJSON();
+$app->get('/api/products', function (Request $request, Response $response) use ($serializer) {
+    global $entityManager;
+    $productRepository = $entityManager->getRepository('Product');
+    $params = $request->getQueryParams();
+    if (isset($params['name']) || isset($params['category'])) {
+        $products = $productRepository->findBy($params);
+    } else {
+        $products = $productRepository->findAll();
+    }
+
+    $json = $serializer->serialize($products, 'json');
     $response->getBody()->write($json);
     return $response;
 });
 
-function getProductsJSON() {
-    return file_get_contents(__DIR__ . '\mock\catalogueMock.json');
-}
-
-$app->get('/api/product/{id}', function (Request $request, Response $response, $args) {
+$app->get('/api/product/{id}', function (Request $request, Response $response, $args) use ($serializer) {
+    global $entityManager;
     $id = $args ['id'];
-    $json = getProductsJSON();
-    $products = json_decode($json, true);
+    $productRepository = $entityManager->getRepository('Product');
+    $product = $productRepository->find($id);
 
-    $product = filterArrayById($products, $id);
-    $response->getBody()->write(json_encode($product));
+    $json = $serializer->serialize($product, 'json');
+    $response->getBody()->write($json);
     return $response;
 });
 
-function filterArrayById($array, $id)
-{
-    $filtered_array = array_filter($array, function ($elem) use ($id) {
-        if (isset($elem['id'])) {
-            return $elem['id'] == $id;
-        }
-        return false;
-    });
-    return current($filtered_array);
-}
-
-$app->post('/api/register', function (Request $request, Response $response) {
+$app->post('/api/register', function (Request $request, Response $response) use ($encoders) {
+    global $entityManager;
     $body = (array)$request->getParsedBody();
     $client = createClientFromBody($body);
-    $response->getBody()->write(json_encode($client));
+    $entityManager->persist($client);
+    $entityManager->flush();
+
+    $normalizer = new ObjectNormalizer();
+    $normalizer->setIgnoredAttributes(['password']);
+    $serializer = new Serializer([$normalizer], $encoders);
+    $json = $serializer->serialize($client, 'json');
+    $response->getBody()->write($json);
     return $response;
 });
 
 function createClientFromBody($body): Client {
     $client = new Client();
-    $client->firstname = $body['firstname'];
-    $client->lastname = $body['lastname'];
-    $client->email = $body['email'];
-    $client->login = $body['login'];
-    $client->password = $body['password'];
-    $client->phone = $body['phone'];
-    $client->locale = $body['locale'];
-    $client->address = $body['address'];
-    $client->city = $body['city'];
-    $client->zip = $body['zip'];
-    $client->country = $body['country'];
-    $client->civility = $body['civility'];
+    $client->setFirstname($body['firstname']);
+    $client->setLastname ($body['lastname']);
+    $client->setEmail($body['email']);
+    $client->setLogin($body['login']);
+    $client->setPassword(password_hash($body['password'], PASSWORD_DEFAULT));
+    $client->setPhone($body['phone']);
+    $client->setLocale($body['locale']);
+    $client->setAddress($body['address']);
+    $client->setCity($body['city']);
+    $client->setZip($body['zip']);
+    $client->setCountry($body['country']);
+    $client->setCivility($body['civility']);
     return $client;
 }
 
@@ -99,9 +120,8 @@ $options = [
     "path" => ["/api"],
     "ignore" => ["/api/login", "/api/register"],
     "error" => function ($response) {
-        $data = array('ERREUR' => 'Connexion', 'ERREUR' => 'JWT Non valide');
         $response = $response->withStatus(401);
-        return $response->withHeader("Content-Type", "application/json")->getBody()->write(json_encode($data));
+        return $response->withHeader("Content-Type", "application/json")->getBody()->write('{"message":"Le token JWT est invalide"}');
     }
 ];
 

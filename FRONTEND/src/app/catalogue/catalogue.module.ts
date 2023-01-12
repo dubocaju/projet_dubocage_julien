@@ -8,6 +8,7 @@ import { ProductDetailComponent } from "./product-detail/product-detail.componen
 import { HTTP_INTERCEPTORS } from "@angular/common/http";
 import { ApiHttpInterceptor } from "../shared/api-http-interceptor";
 import { CatalogueService } from "./services/catalogue.service";
+import { NgxSpinnerModule } from "ngx-spinner";
 
 const routes: Routes = [
   { path: '', component: CatalogueComponent },
@@ -24,6 +25,7 @@ const routes: Routes = [
     CommonModule,
     RouterModule.forChild(routes),
     FormsModule,
+    NgxSpinnerModule,
   ],
   providers: [
     CatalogueService,

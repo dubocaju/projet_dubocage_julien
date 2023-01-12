@@ -1,5 +1,5 @@
 {
-  "name": "tp06-dubocage-julien",
+  "name": "projet-dubocage-julien",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -23,6 +23,7 @@
     "@angular/router": "^14.2.0",
     "@ngxs/store": "^3.7.5",
     "express": "^4.18.1",
+    "ngx-spinner": "^14.0.0",
     "path": "^0.12.7",
     "rxjs": "~7.5.0",
     "tslib": "^2.3.0",

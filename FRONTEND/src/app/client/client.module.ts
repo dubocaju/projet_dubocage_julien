@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from "@angular/router";
 import { RegisterFormComponent } from "./register-form/register-form.component";
 import { ResultFormComponent } from "./result-form/result-form.component";
-import { PasswordPipe } from "./pipes/password.pipe";
 import { PhonePipe } from "./pipes/phone.pipe";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { HttpClientModule } from "@angular/common/http";
@@ -18,7 +17,6 @@ const routes: Routes = [
   declarations: [
     RegisterFormComponent,
     ResultFormComponent,
-    PasswordPipe,
     PhonePipe,
   ],
   imports: [

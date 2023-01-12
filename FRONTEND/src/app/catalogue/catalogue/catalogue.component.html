@@ -1,5 +1,7 @@
+<ngx-spinner type="ball-spin-clockwise-fade" color="#fff"></ngx-spinner>
+
 <div class="container">
-  <h2>Mon super catalogue</h2>
+  <h2>Catalogue</h2>
 
   <app-search
     (reset)="OnReset()"
@@ -15,7 +17,7 @@
             <img class="media-object" src="{{product.image}}" alt="...">
           </div>
           <div class="media-body">
-            <h4 class="media-heading"><a [routerLink]="['/catalogue/product/', product.id]" >{{product.name}}</a></h4>
+            <h4 class="media-heading"><a [routerLink]="['/catalogue/product/', product.id]">{{product.name}}</a></h4>
             <p>{{product.description}}</p>
             <p>Catégorie : {{product.category}}</p>
             <p>Prix : {{product.price}} €</p>
